@@ -152,28 +152,7 @@ saveBtn.addEventListener("click", async () => {
 });
 
 
-let downloadBtn = document.createElement("button");
 
-downloadBtn.innerText = "Download DB";
-
-document.body.append(downloadBtn);
-
-downloadBtn.classList.add("button");
-
-
-downloadBtn.addEventListener("click", () => {
-
-  
-  
-
-  
-
-
-  window.open("http://localhost:8080/download-db");
-  
-  alert("file downloaded!");
-
-});
 
 
    
