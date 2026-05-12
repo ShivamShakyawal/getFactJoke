@@ -1,5 +1,5 @@
 const express = require("express");
-const sqlite3 = require("sqlite3").verbose();
+const Database = require("better-sqlite3");
 const cors = require("cors");
 
 const app = express();
@@ -14,25 +14,21 @@ app.use(express.json());
 // =======================
 // CONNECT SQLITE
 // =======================
-const db = new sqlite3.Database("./database.db", (err) => {
-  if (err) {
-    console.log("DB Error:", err);
-  } else {
-    console.log("SQLite Connected ✅");
-  }
-});
+const db = new Database("database.db");
+
+console.log("SQLite Connected ✅");
 
 
 // =======================
 // CREATE TABLE
 // =======================
-db.run(`
+db.prepare(`
   CREATE TABLE IF NOT EXISTS content (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fact TEXT,
     joke TEXT
   )
-`);
+`).run();
 
 
 // =======================
@@ -47,42 +43,28 @@ app.post("/save", (req, res) => {
     return res.status(400).send("No data to save");
   }
 
-  const sql = `
+  const stmt = db.prepare(`
     INSERT INTO content (fact, joke)
     VALUES (?, ?)
-  `;
+  `);
 
-  db.run(sql, [fact, joke], function(err) {
+  const info = stmt.run(fact, joke);
 
-    if (err) {
-      console.error(err);
-      return res.status(500).send("DB Error");
-    }
-
-    res.status(200).json({
-      message: "Saved successfully ✅",
-      id: this.lastID
-    });
-
+  res.status(200).json({
+    message: "Saved successfully ✅",
+    id: info.lastInsertRowid
   });
 
 });
-
 
 // =======================
 // GET SAVED DATA
 // =======================
 app.get("/data", (req, res) => {
 
-  db.all("SELECT * FROM content", [], (err, rows) => {
+  const rows = db.prepare("SELECT * FROM content").all();
 
-    if (err) {
-      return res.status(500).send(err);
-    }
-
-    res.json(rows);
-
-  });
+  res.json(rows);
 
 });
 
