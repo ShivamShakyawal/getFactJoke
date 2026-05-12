@@ -1,18 +1,16 @@
 const express = require("express");
-const Database = require("better-sqlite3");
 const cors = require("cors");
+const Database = require("better-sqlite3");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
 app.use(express.static(__dirname));
-app.use(express.json());
 
 
 // =======================
-// CONNECT SQLITE
+// CONNECT DATABASE
 // =======================
 const db = new Database("database.db");
 
@@ -32,55 +30,56 @@ db.prepare(`
 
 
 // =======================
-// SAVE DATA
+// SAVE ROUTE
 // =======================
 app.post("/save", (req, res) => {
 
-  let fact = req.body.fact || "";
-  let joke = req.body.joke || "";
+  try {
 
-  if (!fact && !joke) {
-    return res.status(400).send("No data to save");
+    let fact = req.body.fact || "";
+    let joke = req.body.joke || "";
+
+    if (!fact && !joke) {
+      return res.status(400).json({
+        message: "No data to save"
+      });
+    }
+
+    const stmt = db.prepare(`
+      INSERT INTO content (fact, joke)
+      VALUES (?, ?)
+    `);
+
+    const info = stmt.run(fact, joke);
+
+    res.status(200).json({
+      message: "Saved successfully ✅",
+      id: info.lastInsertRowid
+    });
+
+  } catch(err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: "Database Error"
+    });
+
   }
-
-  const stmt = db.prepare(`
-    INSERT INTO content (fact, joke)
-    VALUES (?, ?)
-  `);
-
-  const info = stmt.run(fact, joke);
-
-  res.status(200).json({
-    message: "Saved successfully ✅",
-    id: info.lastInsertRowid
-  });
 
 });
 
+
 // =======================
-// GET SAVED DATA
+// GET DATA
 // =======================
 app.get("/data", (req, res) => {
 
-  const rows = db.prepare("SELECT * FROM content").all();
+  const rows = db.prepare(`
+    SELECT * FROM content
+  `).all();
 
   res.json(rows);
-
-});
-
-
-app.get("/download-db", (req, res) => {
-
-  const filePath = "./database.db";
-
-  res.download(filePath, "database.db", (err) => {
-
-    if (err) {
-      console.log("Download Error:", err);
-      res.status(500).send("Could not download file");
-    }
-
-  });
 
 });
 
