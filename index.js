@@ -115,28 +115,40 @@ saveBtn.innerText = "Save Data";
 document.body.append(saveBtn);
 
 
-saveBtn.addEventListener("click", async (e) => {
+saveBtn.addEventListener("click", async () => {
 
-  // e.preventDefault();
+  try {
 
+    if (!currentFact && !currentJoke) {
+      alert("Nothing to save!");
+      return;
+    }
 
-  if (!currentFact && !currentJoke) {
-    alert("Nothing to save!");
-    return;
+    const res = await fetch("http://localhost:8080/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fact: currentFact,
+        joke: currentJoke
+      })
+    });
+
+    const data = await res.json();
+
+    console.log(data);
+
+    alert("Saved to database ✅");
+
+  } catch(err) {
+
+    console.error(err);
+
+    alert("Failed to save ❌");
+
   }
 
-  await fetch("http://localhost:8080/save", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      fact: currentFact,
-      joke: currentJoke
-    })
-  });
-
-  alert("Saved to database ");
 });
 
 
