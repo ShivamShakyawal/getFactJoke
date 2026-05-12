@@ -1,0 +1,40 @@
+.heading:hover {
+    background-color: wheat;
+}
+
+.button {
+    margin-right: 20px;
+}
+
+.button:hover {
+    background-color:wheat;
+}
+
+.para:hover {
+    background-color:wheat;
+}
+
+.line {
+    background-color:wheat;
+    size:50px;
+    margin-bottom: 30px;
+}
+
+.img {
+    width: 1200px;
+    height: 800px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.inputField {
+    color:black;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+.newInput {
+      color:black;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
